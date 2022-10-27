@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/danielblagy/l0-blagy/entity"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -19,5 +20,7 @@ func main() {
 		log.Fatal("Failed to connect to the database\n", err)
 	}
 
-	log.Print("Connected to the database\n", db)
+	log.Print("Connected to the database")
+
+	db.AutoMigrate(&entity.Order{}, &entity.Item{})
 }

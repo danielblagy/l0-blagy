@@ -1,6 +1,8 @@
 package entity
 
 type Item struct {
+	OrderRefer string
+
 	ChrtId      uint
 	TrackNumber string
 	Price       uint
