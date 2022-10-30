@@ -1,12 +1,13 @@
 package main
 
 import (
-	"encoding/json"
+	"bufio"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/danielblagy/l0-blagy/entity"
-	stan "github.com/nats-io/stan.go"
+	"github.com/danielblagy/l0-blagy/service"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -14,7 +15,7 @@ import (
 func main() {
 	fmt.Println("wb l0-blagy")
 
-	log.Print("Connecting to the db...")
+	log.Print("Connecting to the database...")
 
 	dsn := "host=localhost user=l0user password=l0pass dbname=l0db port=5432 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -30,30 +31,20 @@ func main() {
 	clusterID := "test-cluster"
 	clientID := "test-subscriber"
 
-	sc, _ := stan.Connect(clusterID, clientID)
-	defer sc.Close()
-
-	gotMessage := false
-	var order entity.Order
-
-	// Simple Async Subscriber
-	sub, _ := sc.Subscribe("orders", func(m *stan.Msg) {
-		json.Unmarshal([]byte(m.Data), &order)
-		gotMessage = true
-	})
-	defer sub.Unsubscribe()
-
-	for !gotMessage {
-
-	}
-
-	fmt.Println(order)
-
-	orderJson, err := json.MarshalIndent(order, "", "\t")
+	subscriber, err := service.ConnectAndSubscribe(clusterID, clientID)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal("Failed to connect and subscribe to NATS Streaming server", err)
 	}
+	defer subscriber.Close()
 
-	fmt.Println(string(orderJson))
+	scanner := bufio.NewScanner(os.Stdin)
+	running := true
+	for running {
+		if scanner.Scan() {
+			switch scanner.Text() {
+			case "stop":
+				running = false
+			}
+		}
+	}
 }
