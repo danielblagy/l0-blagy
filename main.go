@@ -47,6 +47,10 @@ func main() {
 	}
 	defer streamManager.Close()
 
+	server := service.NewServer("8080", cacheStore)
+	server.Start()
+	defer server.Stop()
+
 	scanner := bufio.NewScanner(os.Stdin)
 	running := true
 	for running {

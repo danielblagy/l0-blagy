@@ -21,6 +21,7 @@ type StreamManager struct {
 	subscription stan.Subscription
 }
 
+// TODO also return error
 func NewStreamManager(db *gorm.DB, cacheStore *cache.Cache, clusterID, clientID string) *StreamManager {
 	sm := &StreamManager{
 		db:         db,
