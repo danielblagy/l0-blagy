@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -33,10 +34,11 @@ func main() {
 	defer sc.Close()
 
 	gotMessage := false
+	var order entity.Order
 
 	// Simple Async Subscriber
-	sub, _ := sc.Subscribe("foo", func(m *stan.Msg) {
-		fmt.Printf("Received a message: %s\n", string(m.Data))
+	sub, _ := sc.Subscribe("orders", func(m *stan.Msg) {
+		json.Unmarshal([]byte(m.Data), &order)
 		gotMessage = true
 	})
 	defer sub.Unsubscribe()
@@ -44,4 +46,14 @@ func main() {
 	for !gotMessage {
 
 	}
+
+	fmt.Println(order)
+
+	orderJson, err := json.MarshalIndent(order, "", "\t")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(string(orderJson))
 }

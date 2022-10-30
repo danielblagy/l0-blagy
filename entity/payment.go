@@ -1,14 +1,14 @@
 package entity
 
 type Payment struct {
-	Transaction  string
-	RequestId    string
-	Currency     string
-	Provider     string
-	Amount       uint
-	PaymentDt    uint
-	Bank         string
-	DeliveryCost uint
-	GoodsTotal   uint
-	CustomFee    uint
+	Transaction  string `json:"transaction"`
+	RequestId    string `json:"request_id"`
+	Currency     string `json:"currency"`
+	Provider     string `json:"provider"`
+	Amount       uint   `json:"amount"`
+	PaymentDt    uint   `json:"payment_dt"`
+	Bank         string `json:"bank"`
+	DeliveryCost uint   `json:"delivery_cost"`
+	GoodsTotal   uint   `json:"goods_total"`
+	CustomFee    uint   `json:"custom_fee"`
 }
