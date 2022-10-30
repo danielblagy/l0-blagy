@@ -13,7 +13,7 @@
 		<td>{{.Entry}}</td>
 	</tr>
 	<tr>
-		<td>Delivery</td>
+		<td style="vertical-align: top;">Delivery</td>
 		<td>
 			<table>
 			<tr>
@@ -48,7 +48,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td>Payment</td>
+		<td style="vertical-align: top;">Payment</td>
 		<td>
 			<table>
 			<tr>
@@ -95,21 +95,35 @@
 		</td>
 	</tr>
 	<tr>
-		<td>Items</td>
+		<td style="vertical-align: top;">Items</td>
 		<td>
-			<table>{{range $y, $x := .Items }}
+			<table>
+				<tr style="color: gray;">
+					<td>Chrt ID</td>
+					<td>Track Number</td>
+					<td>Price</td>
+					<td>RID</td>
+					<td>Name</td>
+					<td>Sale</td>
+					<td>Size</td>
+					<td>Total Price</td>
+					<td>NM ID</td>
+					<td>Brand</td>
+					<td>Status</td>
+				  </tr>
+				{{range $y, $x := .Items }}
 				<tr>
-				  <td>{{ $x.ChrtId }}</td>
-				  <td>{{ $x.TrackNumber }}</td>
-				  <td>{{ $x.Price }}</td>
-				  <td>{{ $x.Rid }}</td>
-				  <td>{{ $x.Name }}</td>
-				  <td>{{ $x.Sale }}</td>
-				  <td>{{ $x.Size }}</td>
-				  <td>{{ $x.TotalPrice }}</td>
-				  <td>{{ $x.NmId }}</td>
-				  <td>{{ $x.Brand }}</td>
-				  <td>{{ $x.Status }}</td>
+					<td>{{ $x.ChrtId }}</td>
+					<td>{{ $x.TrackNumber }}</td>
+					<td>{{ $x.Price }}</td>
+					<td>{{ $x.Rid }}</td>
+					<td>{{ $x.Name }}</td>
+					<td>{{ $x.Sale }}</td>
+					<td>{{ $x.Size }}</td>
+					<td>{{ $x.TotalPrice }}</td>
+					<td>{{ $x.NmId }}</td>
+					<td>{{ $x.Brand }}</td>
+					<td>{{ $x.Status }}</td>
 				</tr>{{end}}
 			  </table>
 		</td>
