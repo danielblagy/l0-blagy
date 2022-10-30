@@ -8,12 +8,15 @@ import (
 
 	"github.com/danielblagy/l0-blagy/entity"
 	"github.com/danielblagy/l0-blagy/service"
+	"github.com/patrickmn/go-cache"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func main() {
 	fmt.Println("wb l0-blagy")
+
+	// Set up database connection
 
 	log.Print("Connecting to the database...")
 
@@ -27,12 +30,16 @@ func main() {
 
 	db.AutoMigrate(&entity.Order{}, &entity.Item{})
 
+	// Initialize cache storage
+
+	cacheStore := cache.New(cache.NoExpiration, cache.NoExpiration)
+
 	// test subscriber
 	clusterID := "test-cluster"
 	clientID := "test-subscriber"
 	incomingDataChannelName := "orders"
 
-	streamManager := service.NewStreamManager(db, clusterID, clientID)
+	streamManager := service.NewStreamManager(db, cacheStore, clusterID, clientID)
 
 	if err := streamManager.ConnectAndSubscribe(incomingDataChannelName); err != nil {
 		log.Fatal("Failed to connect and subscribe to NATS Streaming server", err)

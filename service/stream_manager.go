@@ -6,23 +6,27 @@ import (
 
 	"github.com/danielblagy/l0-blagy/entity"
 	"github.com/nats-io/stan.go"
+	"github.com/patrickmn/go-cache"
 	"gorm.io/gorm"
 )
 
 // NATS Streaming client that subscribes to a channel and stores incoming data in a database
+// also manages cache storage
 type StreamManager struct {
 	db           *gorm.DB
+	cacheStore   *cache.Cache
 	ClusterID    string
 	ClientID     string
 	connection   stan.Conn
 	subscription stan.Subscription
 }
 
-func NewStreamManager(db *gorm.DB, clusterID, clientID string) *StreamManager {
+func NewStreamManager(db *gorm.DB, cacheStore *cache.Cache, clusterID, clientID string) *StreamManager {
 	return &StreamManager{
-		db:        db,
-		ClusterID: clusterID,
-		ClientID:  clientID,
+		db:         db,
+		cacheStore: cacheStore,
+		ClusterID:  clusterID,
+		ClientID:   clientID,
 	}
 }
 
@@ -56,6 +60,20 @@ func (sm *StreamManager) Close() {
 	sm.connection.Close()
 }
 
+func (sm *StreamManager) storeData(order *entity.Order) error {
+	// store in db
+	result := sm.db.Create(order)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// store in cache
+	// TODO use Add instead
+	sm.cacheStore.Set(order.OrderUid, order, cache.NoExpiration)
+
+	return nil
+}
+
 func (sm *StreamManager) handleMessage(m *stan.Msg) {
 	var order entity.Order
 
@@ -64,8 +82,11 @@ func (sm *StreamManager) handleMessage(m *stan.Msg) {
 
 	// TODO validate incoming data
 
-	result := sm.db.Create(&order)
-	log.Print(result)
+	log.Println(sm.cacheStore.Get("b563feb7b2b84b6test"))
+
+	if err := sm.storeData(&order); err != nil {
+		log.Print("Failed to store data", err)
+	}
 
 	// was used for testing
 	/*orderJson, err := json.MarshalIndent(order, "", "\t")
@@ -74,4 +95,6 @@ func (sm *StreamManager) handleMessage(m *stan.Msg) {
 		return
 	}
 	log.Println("converted entity to json (just for testing)\n", string(orderJson))*/
+
+	log.Println(sm.cacheStore.Get("b563feb7b2b84b6test"))
 }
