@@ -22,12 +22,16 @@ type StreamManager struct {
 }
 
 func NewStreamManager(db *gorm.DB, cacheStore *cache.Cache, clusterID, clientID string) *StreamManager {
-	return &StreamManager{
+	sm := &StreamManager{
 		db:         db,
 		cacheStore: cacheStore,
 		ClusterID:  clusterID,
 		ClientID:   clientID,
 	}
+
+	sm.initCacheFromDatabase()
+
+	return sm
 }
 
 func (sm *StreamManager) ConnectAndSubscribe(channelName string) error {
@@ -60,6 +64,20 @@ func (sm *StreamManager) Close() {
 	sm.connection.Close()
 }
 
+func (sm *StreamManager) initCacheFromDatabase() error {
+	var orders []entity.Order
+	if result := sm.db.Find(&orders); result.Error != nil {
+		log.Print("Failed to load data from the database")
+		return result.Error
+	}
+
+	for _, order := range orders {
+		sm.cacheStore.Set(order.OrderUid, order, cache.NoExpiration)
+	}
+
+	return nil
+}
+
 func (sm *StreamManager) storeData(order *entity.Order) error {
 	// store in db
 	result := sm.db.Create(order)
@@ -68,7 +86,7 @@ func (sm *StreamManager) storeData(order *entity.Order) error {
 	}
 
 	// store in cache
-	// TODO use Add instead
+	// TODO use Add instead ??
 	sm.cacheStore.Set(order.OrderUid, order, cache.NoExpiration)
 
 	return nil

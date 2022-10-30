@@ -40,6 +40,7 @@ func main() {
 	incomingDataChannelName := "orders"
 
 	streamManager := service.NewStreamManager(db, cacheStore, clusterID, clientID)
+	log.Println(cacheStore.Get("b563feb7b2b84b6test"))
 
 	if err := streamManager.ConnectAndSubscribe(incomingDataChannelName); err != nil {
 		log.Fatal("Failed to connect and subscribe to NATS Streaming server", err)
