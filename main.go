@@ -30,12 +30,14 @@ func main() {
 	// test subscriber
 	clusterID := "test-cluster"
 	clientID := "test-subscriber"
+	incomingDataChannelName := "orders"
 
-	subscriber, err := service.ConnectAndSubscribe(clusterID, clientID)
-	if err != nil {
+	streamManager := service.NewStreamManager(clusterID, clientID)
+
+	if err := streamManager.ConnectAndSubscribe(incomingDataChannelName); err != nil {
 		log.Fatal("Failed to connect and subscribe to NATS Streaming server", err)
 	}
-	defer subscriber.Close()
+	defer streamManager.Close()
 
 	scanner := bufio.NewScanner(os.Stdin)
 	running := true
