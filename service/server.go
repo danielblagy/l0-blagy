@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 
-	"github.com/danielblagy/l0-blagy/entity"
 	"github.com/patrickmn/go-cache"
 )
 
@@ -47,7 +47,9 @@ func (s *Server) GetById(w http.ResponseWriter, r *http.Request) {
 
 	order, exists := s.cacheStore.Get(id)
 	if exists {
-		fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", order.(entity.Order).OrderUid, order.(entity.Order).TrackNumber)
+		t, _ := template.ParseFiles("service/templates/order.html")
+		t.Execute(w, order)
+		//fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", order.(entity.Order).OrderUid, order.(entity.Order).TrackNumber)
 	} else {
 		fmt.Fprintf(w, "<h1>404</h1><div>No order with that id.</div>")
 	}

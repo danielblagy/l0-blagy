@@ -66,7 +66,7 @@ func (sm *StreamManager) Close() {
 
 func (sm *StreamManager) initCacheFromDatabase() error {
 	var orders []entity.Order
-	if result := sm.db.Find(&orders); result.Error != nil {
+	if result := sm.db.Preload("Items").Find(&orders); result.Error != nil {
 		log.Print("Failed to load data from the database")
 		return result.Error
 	}
