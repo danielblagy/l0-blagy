@@ -1,6 +1,7 @@
 package entity
 
 type Item struct {
+	Id         int    `json:"-" gorm:"primary key"`
 	OrderRefer string `json:"-"`
 
 	ChrtId      uint   `json:"chrt_id"`
