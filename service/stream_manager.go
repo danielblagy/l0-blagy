@@ -21,7 +21,6 @@ type StreamManager struct {
 	subscription stan.Subscription
 }
 
-// TODO also return error
 func NewStreamManager(db *gorm.DB, cacheStore *cache.Cache, clusterID, clientID string) *StreamManager {
 	sm := &StreamManager{
 		db:         db,
@@ -87,8 +86,8 @@ func (sm *StreamManager) storeData(order *entity.Order) error {
 	}
 
 	// store in cache
-	// TODO use Add instead ??
-	sm.cacheStore.Set(order.OrderUid, order, cache.NoExpiration)
+	// (store order value, not the pointer)
+	sm.cacheStore.Set(order.OrderUid, *order, cache.NoExpiration)
 
 	return nil
 }

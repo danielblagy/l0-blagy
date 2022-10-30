@@ -27,12 +27,10 @@ func (s *Server) Start() error {
 
 	var startingError error = nil
 	go func() {
+		// the goroutine will be finished when Stop() is called
 		if err := s.httpServer.ListenAndServe(); err != nil {
-			log.Println("Failed to run HTTP server on", s.httpServer.Addr)
 			startingError = err
 		}
-
-		log.Println("The HTTP server goroutine is finished! ")
 	}()
 
 	log.Println("HTTP server is listening on ", s.httpServer.Addr)

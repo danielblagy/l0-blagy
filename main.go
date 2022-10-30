@@ -48,7 +48,9 @@ func main() {
 	defer streamManager.Close()
 
 	server := service.NewServer("8080", cacheStore)
-	server.Start()
+	if err := server.Start(); err != nil {
+		log.Println("HTTP server failed to start", err)
+	}
 	defer server.Stop()
 
 	scanner := bufio.NewScanner(os.Stdin)
