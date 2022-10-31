@@ -8,7 +8,7 @@ func main() {
 
 	newOrder := `
 	{
-		"order_uid": "b563feb7b2b84b6test",
+		"order_uid": "b563feb7b2b84b6tes5",
 		"track_number": "WBILMTESTTRACK",
 		"entry": "WBIL",
 		"delivery": {

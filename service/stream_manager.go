@@ -44,8 +44,7 @@ func (sm *StreamManager) ConnectAndSubscribe(channelName string) error {
 	sm.connection = sc
 
 	// Simple Async Subscriber
-	// TODO make a durable subscription instead of a reguler one (to store missed messages when was offline)
-	sub, err := sc.Subscribe(channelName, sm.handleMessage)
+	sub, err := sc.Subscribe(channelName, sm.handleMessage, stan.DurableName("orders-durable"))
 	if err != nil {
 		return err
 	}
@@ -59,9 +58,8 @@ func (sm *StreamManager) ConnectAndSubscribe(channelName string) error {
 
 func (sm *StreamManager) Close() {
 	log.Print("Closing a subscriber")
-	// TODO don't unsubscribe a durable subscription
-	//		call this sm.subscription.Close() instead
-	sm.subscription.Unsubscribe()
+
+	sm.subscription.Close()
 	sm.connection.Close()
 }
 
