@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/danielblagy/l0-blagy/entity"
+	"github.com/go-playground/validator/v10"
 	"github.com/nats-io/stan.go"
 	"github.com/patrickmn/go-cache"
 	"gorm.io/gorm"
@@ -93,18 +94,33 @@ func (sm *StreamManager) storeData(order *entity.Order) error {
 }
 
 func (sm *StreamManager) handleMessage(m *stan.Msg) {
+	log.Println("Stream Manager: new incoming message")
+
 	var order entity.Order
 
-	json.Unmarshal([]byte(m.Data), &order)
-	log.Println("converted incoming json to entity\n", order)
+	if err := json.Unmarshal([]byte(m.Data), &order); err != nil {
+		log.Println("Stream Manager: failed to parse the message", err)
+		return
+	}
+	//log.Println("converted incoming json to entity\n", order)
 
-	// TODO validate incoming data
+	// validate incoming data
+	validator := validator.New()
+	if err := validator.Struct(order); err != nil {
+		log.Println("Stream Manager: invalid data", err)
+		return
+	}
 
-	log.Println(sm.cacheStore.Get("b563feb7b2b84b6test"))
+	//log.Println(sm.cacheStore.Get("b563feb7b2b84b6test"))
 
 	if err := sm.storeData(&order); err != nil {
-		log.Print("Failed to store data", err)
+		log.Print("Stream Manager: failed to store data", err)
+		return
 	}
+
+	log.Println("Stream Manager: ------data has been stored------")
+	log.Println(order)
+	log.Println("Stream Manager: ------the end of data display------")
 
 	// was used for testing
 	/*orderJson, err := json.MarshalIndent(order, "", "\t")
@@ -114,5 +130,5 @@ func (sm *StreamManager) handleMessage(m *stan.Msg) {
 	}
 	log.Println("converted entity to json (just for testing)\n", string(orderJson))*/
 
-	log.Println(sm.cacheStore.Get("b563feb7b2b84b6test"))
+	//log.Println(sm.cacheStore.Get("b563feb7b2b84b6test"))
 }
