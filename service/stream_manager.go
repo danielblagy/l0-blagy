@@ -100,7 +100,6 @@ func (sm *StreamManager) handleMessage(m *stan.Msg) {
 		log.Println("Stream Manager: failed to parse the message", err)
 		return
 	}
-	//log.Println("converted incoming json to entity\n", order)
 
 	// validate incoming data
 	validator := validator.New()
@@ -108,8 +107,6 @@ func (sm *StreamManager) handleMessage(m *stan.Msg) {
 		log.Println("Stream Manager: invalid data", err)
 		return
 	}
-
-	//log.Println(sm.cacheStore.Get("b563feb7b2b84b6test"))
 
 	if err := sm.storeData(&order); err != nil {
 		log.Print("Stream Manager: failed to store data", err)
@@ -119,14 +116,4 @@ func (sm *StreamManager) handleMessage(m *stan.Msg) {
 	log.Println("Stream Manager: ------data has been stored------")
 	log.Println(order)
 	log.Println("Stream Manager: ------the end of data display------")
-
-	// was used for testing
-	/*orderJson, err := json.MarshalIndent(order, "", "\t")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	log.Println("converted entity to json (just for testing)\n", string(orderJson))*/
-
-	//log.Println(sm.cacheStore.Get("b563feb7b2b84b6test"))
 }
